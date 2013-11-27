@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.tuberlin.dima</groupId>
-	<artifactId>zookeeper-test</artifactId>
+	<artifactId>counter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Zookeeper Test</name>
+	<name>Logistic Regression Implementations for Stratosphere Ozone</name>
 
 	<packaging>jar</packaging>
 
@@ -21,16 +21,40 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build>     
+
 
 	<dependencies>
-		
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
 			<version>3.4.5</version>
 		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.netflix.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+		            
 
+		<dependency>
+			<groupId>eu.stratosphere</groupId>
+			<artifactId>pact-common</artifactId>
+			<version>0.4-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>eu.stratosphere</groupId>
+			<artifactId>pact-clients</artifactId>
+			<version>0.4-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 </project>

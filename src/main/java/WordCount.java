@@ -17,8 +17,6 @@
 import java.io.Serializable;
 import java.util.Iterator;
 
-import org.apache.zookeeper.ZooKeeper;
-
 import eu.stratosphere.nephele.configuration.Configuration;
 import eu.stratosphere.pact.client.LocalExecutor;
 import eu.stratosphere.pact.common.contract.FileDataSink;
