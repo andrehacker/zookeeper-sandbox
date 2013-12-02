@@ -30,10 +30,10 @@ import eu.stratosphere.pact.common.plan.Plan;
 import eu.stratosphere.pact.common.plan.PlanAssembler;
 import eu.stratosphere.pact.common.plan.PlanAssemblerDescription;
 import eu.stratosphere.pact.common.stubs.Collector;
-import eu.stratosphere.pact.common.stubs.Counter;
 import eu.stratosphere.pact.common.stubs.MapStub;
 import eu.stratosphere.pact.common.stubs.ReduceStub;
 import eu.stratosphere.pact.common.stubs.StubAnnotation.ConstantFields;
+import eu.stratosphere.pact.common.stubs.aggregators.DoubleCounter;
 import eu.stratosphere.pact.common.type.PactRecord;
 import eu.stratosphere.pact.common.type.base.PactInteger;
 import eu.stratosphere.pact.common.type.base.PactString;
@@ -60,19 +60,22 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		private final AsciiUtils.WhitespaceTokenizer tokenizer =
 				new AsciiUtils.WhitespaceTokenizer();
 		
-		Counter cnt = null;
+		DoubleCounter cntNumRecords = null;
+    DoubleCounter cntNonZeros = null;
 		@Override
 		public void open(Configuration parameters) throws Exception {
 			super.open(parameters);
-			this.cnt = getRuntimeContext().getCounter("bla");
+			this.cntNumRecords = getRuntimeContext().getDoubleCounter("numRecords");
+      this.cntNonZeros = getRuntimeContext().getDoubleCounter("nonZeros");
 		}
 		
 		@Override
 		public void map(PactRecord record, Collector<PactRecord> collector) {
 			
-			cnt.increment(10);
-			
-			getRuntimeContext().getCounter("bla").increment(20);
+			cntNumRecords.add(10d);
+			cntNonZeros.add(20d);
+//			
+//			getRuntimeContext().getCounter("bla").increment(20);
 			
 			// get the first field (as type PactString) from the record
 			PactString line = record.getField(0, PactString.class);
@@ -167,7 +170,7 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 	public static void main(String[] args) throws Exception {
 		WordCount wc = new WordCount();
 		
-		args = new String[] {"2", "file:///home/andre/dev/counters/test", "file:///home/andre/dev/counters/output"};
+		args = new String[] {"2", "file:///home/andre/dev/sandbox/test", "file:///home/andre/dev/counters/output"};
 		
 		if (args.length < 3) {
 			System.err.println(wc.getDescription());
