@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.tuberlin.dima</groupId>
-	<artifactId>counter</artifactId>
+	<artifactId>sandbox</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Logistic Regression Implementations for Stratosphere Ozone</name>
 

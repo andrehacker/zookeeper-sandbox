@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import eu.stratosphere.nephele.configuration.Configuration;
+import eu.stratosphere.pact.client.ExecutionResult;
 import eu.stratosphere.pact.client.LocalExecutor;
 import eu.stratosphere.pact.common.contract.FileDataSink;
 import eu.stratosphere.pact.common.contract.FileDataSource;
@@ -60,20 +61,20 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		private final AsciiUtils.WhitespaceTokenizer tokenizer =
 				new AsciiUtils.WhitespaceTokenizer();
 		
-		DoubleCounter cntNumRecords = null;
-    DoubleCounter cntNonZeros = null;
+		DoubleCounter cntNumLines = null;
+    DoubleCounter cntNumWords = null;
 		@Override
 		public void open(Configuration parameters) throws Exception {
 			super.open(parameters);
-			this.cntNumRecords = getRuntimeContext().getDoubleCounter("numRecords");
-      this.cntNonZeros = getRuntimeContext().getDoubleCounter("nonZeros");
+			this.cntNumLines = getRuntimeContext().getDoubleCounter("num-lines");
+      this.cntNumWords = getRuntimeContext().getDoubleCounter("num-words");
 		}
 		
 		@Override
 		public void map(PactRecord record, Collector<PactRecord> collector) {
 			
-			cntNumRecords.add(10d);
-			cntNonZeros.add(20d);
+			cntNumLines.add(10d);
+			cntNumWords.add(20d);
 //			
 //			getRuntimeContext().getCounter("bla").increment(20);
 			
@@ -181,8 +182,11 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		
 		// This will execute the word-count embedded in a local context. replace this line by the commented
 		// succeeding line to send the job to a local installation or to a cluster for execution
-		LocalExecutor.execute(plan);
+		ExecutionResult res = LocalExecutor.execute(plan);
 //		PlanExecutor ex = new RemoteExecutor("localhost", 6123, "target/pact-examples-0.4-SNAPSHOT-WordCount.jar");
 //		ex.executePlan(plan);
+		
+		long numLines = res.getLongCounters().get("num-lines");
+		System.out.println("Number of lines: " + numLines);
 	}
 }

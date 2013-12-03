@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
-
 
 public class ZooKeeperRunner {
   
@@ -42,7 +40,9 @@ public class ZooKeeperRunner {
   private StreamCollector zkProcessCollector = null;
   
   public ZooKeeperRunner() {
-    String workingDir = Paths.get("").toAbsolutePath().toString();
+  	// Java 7 only
+//    String workingDir = Paths.get("").toAbsolutePath().toString();
+    String workingDir = "";
     this.zkDataDir = workingDir + "/zookeeper/data";
     this.configFilePath = workingDir + "/zoo.cfg";
     zkFullJarPath = workingDir + "/zookeeper-3.4.5.jar";
