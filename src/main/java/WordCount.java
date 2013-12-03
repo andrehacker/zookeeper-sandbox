@@ -35,6 +35,7 @@ import eu.stratosphere.pact.common.stubs.MapStub;
 import eu.stratosphere.pact.common.stubs.ReduceStub;
 import eu.stratosphere.pact.common.stubs.StubAnnotation.ConstantFields;
 import eu.stratosphere.pact.common.stubs.aggregators.DoubleCounter;
+import eu.stratosphere.pact.common.stubs.aggregators.IntCounter;
 import eu.stratosphere.pact.common.type.PactRecord;
 import eu.stratosphere.pact.common.type.base.PactInteger;
 import eu.stratosphere.pact.common.type.base.PactString;
@@ -61,40 +62,41 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		private final AsciiUtils.WhitespaceTokenizer tokenizer =
 				new AsciiUtils.WhitespaceTokenizer();
 		
-		DoubleCounter cntNumLines = null;
+		IntCounter cntNumLines = null;
     DoubleCounter cntNumWords = null;
 		@Override
 		public void open(Configuration parameters) throws Exception {
+		  System.out.println("Map: open");
 			super.open(parameters);
-			this.cntNumLines = getRuntimeContext().getDoubleCounter("num-lines");
+			this.cntNumLines = getRuntimeContext().getIntCounter("num-lines");
       this.cntNumWords = getRuntimeContext().getDoubleCounter("num-words");
 		}
 		
 		@Override
 		public void map(PactRecord record, Collector<PactRecord> collector) {
+      System.out.println("Map: map");
+      
+			cntNumLines.add(1);
 			
-			cntNumLines.add(10d);
-			cntNumWords.add(20d);
-//			
-//			getRuntimeContext().getCounter("bla").increment(20);
-			
-			// get the first field (as type PactString) from the record
 			PactString line = record.getField(0, PactString.class);
-
-			// normalize the line
 			AsciiUtils.replaceNonWordChars(line, ' ');
 			AsciiUtils.toLowerCase(line);
-			
-			// tokenize the line
 			this.tokenizer.setStringToTokenize(line);
 			while (tokenizer.next(this.word))
 			{
-				// we emit a (word, 1) pair 
+	      cntNumWords.add(1d);
 				this.outputRecord.setField(0, this.word);
 				this.outputRecord.setField(1, this.one);
 				collector.collect(this.outputRecord);
 			}
 		}
+		
+		@Override
+		public void close() throws Exception {
+      System.out.println("Map: close");
+		  cntNumLines.add(1);
+		}
+		
 	}
 
 	/**
@@ -110,7 +112,13 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		private final PactInteger cnt = new PactInteger();
 		
 		@Override
+		public void open(Configuration parameters) throws Exception {
+      System.out.println("Reduce: open");
+		}
+		
+		@Override
 		public void reduce(Iterator<PactRecord> records, Collector<PactRecord> out) throws Exception {
+      System.out.println("Reduce: reduce");
 			PactRecord element = null;
 			int sum = 0;
 			while (records.hasNext()) {
@@ -126,8 +134,14 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 		
 		@Override
 		public void combine(Iterator<PactRecord> records, Collector<PactRecord> out) throws Exception {
+      System.out.println("Reduce: combine");
 			// the logic is the same as in the reduce function, so simply call the reduce method
 			reduce(records, out);
+		}
+		
+		@Override
+		public void close() throws Exception {
+      System.out.println("Reduce: close");
 		}
 	}
 
@@ -171,7 +185,7 @@ public class WordCount implements PlanAssembler, PlanAssemblerDescription {
 	public static void main(String[] args) throws Exception {
 		WordCount wc = new WordCount();
 		
-		args = new String[] {"2", "file:///home/andre/dev/sandbox/test", "file:///home/andre/dev/counters/output"};
+		args = new String[] {"1", "file:///home/andre/dev/sandbox/test", "file:///home/andre/dev/counters/output"};
 		
 		if (args.length < 3) {
 			System.err.println(wc.getDescription());
